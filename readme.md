@@ -1,31 +1,38 @@
-### AWS Terraform HA WordPress deployment
+Task:
+======
+• Create a default WordPress site in AWS with Terraform and automate all the steps
+needed.
+• Use the webserver and DB engine you prefer with the latest compatible versions.
+• Use Frankfurt region.
 
-## Description:
-This TF script will deploy a single region highly available WordPress site with RDS, EC2 and VPC. 
 
-## Before running
-Along with your API credentials, ensure you specify the AMI ID in your .tfvars file. A sample has been created to reference. Please use a cloud-ready Ubuntu Xenial image. For list of official AMI's see: https://cloud-images.ubuntu.com/locator/ec2/.
+Resources needed:
+=================
+• VPC
+• 1 Application Load Balancer
+• 1 EC2 instance for the webserver
+• 1 RDS instance for the DB
+• S3 bucket for the state file
 
-## Open issues
-Need to find way to provision EC2 instances into multiple subnets (two web subnets, vs existing one) with 1 count variable, and also be able to provide the id's for the target group attachment. For now, all web servers are deployed into only one AZ. 
 
-The code describing the extra subnet, NAT gateway, EIP along with the extra instance are commented out for now. 
+TODOs:
+=======
+• Create the infrastructure into a VPC with the CIDR block 10.10.0.0/21 and create at
+least 2 private and 2 public subnets.
+• RDS instance must be in one of the private subnet.
+• Use an encrypted S3 bucket for storing the tfstate file.
+• For the webserver, use the latest Amazon Linux 2 AMI available.
+• Additionally, the site should be reachable only on HTTP port from the external IP
+address where the TF script was initiated.
+• The Terraform script should give an output with the link for the WP site (use the
+ALB’s DNS name).
 
-### Networks to be provisioned:
-- 1 VPC 
-- 2 Database subnets 
-- 1  Web subnets 
-- 2  public subnets 
 
-### Resources:
-- 1 NLB
-- 2 web servers (or more) (Ubuntu Xenial)
-- 1 RDS instance (MySQL 5.7)
 
-### Stratoscale Symphony Requirements:
-- Load balancing enabled and initialized from the UI
-- RDS Enabled with Mysql 5.7 engine initialized
-- VPC mode enabled for tenant project
+Use solutions for the resources based on AWS' free tier!
+Upload your Terraform code to a public repository of a preferred cloud-based Git service and
+provide the URL for us.
 
-### Tested with: Terraform v0.11.7
-
+Please send evidences:
+• the output from the TF script
+• screenshot from the WP site that is working on your AWS account
