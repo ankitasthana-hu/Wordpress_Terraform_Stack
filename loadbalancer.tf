@@ -68,6 +68,7 @@ resource "aws_lb_target_group_attachment" "attach_web" {
 # Listener for NLB
 resource "aws_lb_listener" "webport" {
   load_balancer_arn = "${aws_lb.web-lb.arn}"
+  load_balancer_dns = "${aws_lb.web-lb.dns_name}"
   port = 80
   protocol = "TCP"
    default_action {

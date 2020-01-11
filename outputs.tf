@@ -1,3 +1,3 @@
 output "lb_address" {
-  value = "${aws_lb.web-lb.arn}"
+  value = "${aws_lb.web-lb.dns_name}"
 }
