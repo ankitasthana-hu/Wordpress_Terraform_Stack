@@ -1,0 +1,98 @@
+Task:
+======
+• Create a default WordPress site in AWS with Terraform and automate all the steps
+needed.
+• Use the webserver and DB engine you prefer with the latest compatible versions.
+• Use Frankfurt region.
+
+
+Resources needed:
+=================
+• VPC
+• 1 Application Load Balancer
+• 1 EC2 instance for the webserver
+• 1 RDS instance for the DB
+• S3 bucket for the state file
+
+
+TODOs:
+=======
+• Create the infrastructure into a VPC with the CIDR block 10.10.0.0/21 and create at
+least 2 private and 2 public subnets.
+Result: Refer network.tf which contains VPC creation and web/database VPC.
+• RDS instance must be in one of the private subnet.
+Result: RDS define in private subnet of VPC.
+resource "aws_db_subnet_group" "dbsubnet" {
+  name       = "main"
+  subnet_ids = ["${aws_subnet.db_subnet1.id}", "${aws_subnet.db_subnet2.id}"]
+}
+
+#provision the database
+resource "aws_db_instance" "wpdb" {
+  identifier = "wpdb"
+  instance_class = "db.m4.large"
+  allocated_storage = 50
+  engine = "mysql"
+  name = "wordpress"
+  password = "${var.db_password}"
+  username = "${var.db_user}"
+  # If using Symphony, use 5.7.00, otherwise us AWS reccomended version 
+  #engine_version = "5.7.00"
+  engine_version = "5.7.21"
+  skip_final_snapshot = true
+  db_subnet_group_name = "${aws_db_subnet_group.dbsubnet.name}"
+  vpc_security_group_ids = ["${aws_security_group.db.id}"]
+  # Workaround for Symphony 
+  #lifecycle {
+  #  ignore_changes = ["engine", "auto_minor_version_upgrade"]
+  #}
+}
+
+• Use an encrypted S3 bucket for storing the tfstate file.
+Result: In backend.tf, define bucket to store terraform.tfstate file
+
+terraform {
+  backend "s3" {
+    bucket = "bucketbetvictor"
+    key    = "terraform.tfstate"
+    region = "eu-central-1"
+  }
+}
+• For the webserver, use the latest Amazon Linux 2 AMI available.
+Result: In web.tf
+resource "aws_instance" "web-server" {
+  ami = "${var.web_ami}"
+  # The public SG is added for SSH and ICMP
+  vpc_security_group_ids = ["${aws_security_group.web-sec.id}", "${aws_security_group.allout.id}"]
+  instance_type = "${var.web_instance_type}"
+  # Attaching to first web subnet for now, until NLB target group issue can be resolved
+  subnet_id = "${aws_subnet.web_subnet1.id}"
+  # my private key for testing
+  #key_name = "win3_aws"
+
+  tags {
+    Name = "BetVictor-${count.index}"
+  }
+  count = "${var.web_number}"
+  depends_on = ["aws_db_instance.wpdb"]
+  user_data = "${data.template_cloudinit_config.wpdeploy_config.rendered}"
+}
+
+
+• Additionally, the site should be reachable only on HTTP port from the external IP
+address where the TF script was initiated.
+Result: 
+Refer snapshot-11 Only HTTP acceptable with website
+http://web-lb-tf-32af393152eb8891.elb.eu-central-1.amazonaws.com
+
+• The Terraform script should give an output with the link for the WP site (use the
+ALB’s DNS name).
+Result:
+Apply complete! Resources: 6 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+aws_lb = web-lb-tf-32af393152eb8891.elb.eu-central-1.amazonaws.com
+
+
+All snapshots and terraform execution have been attached inside snapshot folder.
