@@ -34,7 +34,7 @@ resource "aws_instance" "web-server" {
   #key_name = "win3_aws"
 
   tags {
-    Name = "AZ 1 web-server-${count.index}"
+    Name = "BetVictor-${count.index}"
   }
   count = "${var.web_number}"
   depends_on = ["aws_db_instance.wpdb"]

@@ -1,17 +1,24 @@
-variable "symp_secret_key" {}
-variable "symp_access_key" {}
-variable "symphony_ip" {}
-variable "web_number" {}
-#variable "web_number2" {}
-variable "web_ami" {}
-variable "web_instance_type" {}
+variable "web_number" {
+default = "1"
+}
+variable "web_ami" {
+default = "ami-0b93ac5d3f3f7d809"
+}
+variable "web_instance_type" {
+default = "t2.medium"
+}
 
-variable "db_password" {}
-variable "db_user" {}
+variable "db_password" {
+default = "Stratoscale!Orchestration!"
+}
+variable "db_user" {
+default = "admin"
+}
 
 
-# Specify a sg with all egress access open for Symphony, uncomment this variable
-#variable "open_sg" {}
-
-variable "aws_secret_key" {}
-variable "aws_access_key" {}
+variable "aws_secret_key" {
+default = "snls2Clrt7X6grbjQrPecF2r2Asug3/kQ1toQLal"
+}
+variable "aws_access_key" {
+default = "AKIAJNPTPXWTODTZY4XA"
+}

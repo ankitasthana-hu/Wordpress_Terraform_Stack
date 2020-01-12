@@ -49,6 +49,8 @@ resource "aws_lb" "web-lb" {
   internal = false
   load_balancer_type = "network"
   subnets = ["${aws_subnet.pub_subnet1.id}","${aws_subnet.pub_subnet2.id}"]
+
+  
 }
 #Target group definition for NLB
 resource "aws_lb_target_group" "targetgrp" {
